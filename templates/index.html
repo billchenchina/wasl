@@ -1,0 +1,315 @@
+{% extends "layout.html" %}
+{% block title %}主页{% endblock %}
+{% block head %}
+{{ super() }}
+
+<style>
+    li {
+        list-style: none
+    }
+</style>
+<style type="text/css">
+    img.normal1 {
+        height: 160px;
+    }
+
+    img.normal2 {
+        height: 160px;
+    }
+
+    img.normal3 {
+        height: 160px;
+    }
+
+    img.normal4 {
+        height: 160px;
+    }
+
+    img.normal5 {
+        height: 160px;
+    }
+
+    img.normal6 {
+        height: 160px;
+    }
+</style>
+{% endblock %}
+
+{% block banner %}
+<!--
+              ".inner" is set up as an inline-block so it automatically expands
+              in both directions to fit whatever's inside it. This means it won't
+              automatically wrap lines, so be sure to use line breaks where
+              appropriate (<br />).
+          -->
+<div class="inner">
+    <header>
+        <h2>WASL</h2>
+    </header>
+    <p>This is <strong>WASL</strong>.</p>
+    <footer>
+        <ul class="buttons stacked">
+            <li><a href="#main" class="button fit scrolly">Tell Me More</a></li>
+        </ul>
+    </footer>
+
+</div>
+{% endblock %}
+
+
+{% block main %}
+
+<header class="special container">
+    <span class="icon solid fa-chart-bar"></span>
+    <h2>HomePage</h2>
+    <p></p>
+</header>
+
+<!-- One -->
+<section class="wrapper style2 container special-alt">
+    <div class="row gtr-50">
+        <div class="col-8 col-12-narrower">
+
+            <header>
+                <h2>World Wide Web</h2>
+            </header>
+            <p>Web即全球广域网，也称为万维网， 它是一种基于超文本和HTTP的、全球性的、动态交互的、跨平台的分布式图形信息系统。是建立
+                在Internet上的一种网络服务，为浏览者在Internet上查找和浏览信息提供了图形化的、易于访
+                问的直观界面，其中的文档及超级链接将Internet上的信息节点组织成一个互为关联的网状结构。（摘自：<a
+                    href="https://zhidao.baidu.com/question/878976938958733172.html" target="_blank">百度知道</a>）</p>
+            <footer>
+                <ul class="buttons">
+                    <li><a href="#" class="button">Find Out More</a></li>
+                </ul>
+            </footer>
+
+        </div>
+        <!--
+      <div class="col-4 col-12-narrower imp-narrower">
+
+          <ul class="featured-icons">
+              <li><span class="icon fa-clock"><span class="label">Feature 1</span></span></li>
+              <li><span class="icon solid fa-volume-up"><span class="label">Feature 2</span></span></li>
+              <li><span class="icon solid fa-laptop"><span class="label">Feature 3</span></span></li>
+              <li><span class="icon solid fa-inbox"><span class="label">Feature 4</span></span></li>
+              <li><span class="icon solid fa-lock"><span class="label">Feature 5</span></span></li>
+              <li><span class="icon solid fa-cog"><span class="label">Feature 6</span></span></li>
+          </ul>
+
+      </div>
+      -->
+    </div>
+</section>
+
+<!-- Two -->
+<section class="wrapper style1 container special">
+    <div class="row">
+        <div class="col-4 col-12-narrower">
+
+            <section>
+                <!--<span class="icon solid featured fa-check"></span>-->
+                <header>
+                    <h3>&emsp;soft music</h3>
+                </header>
+
+                <tr>
+                    <td>
+                        <ul>
+                            <li><a href="{{ url_for('static', filename='video/mainv.mp3') }}" target="_blank">first
+                                    one</a></li>
+                            <li><a href="{{ url_for('static', filename='video/Gilda Buttà - Tarantella in Third Class.mp3') }}"
+                                    target="_blank">second
+                                    one</a></li>
+                            <li><a href="{{ url_for('static', filename='video/Gilda Buttà - Enduring Movement.mp3') }}"
+                                    target="_blank">third
+                                    one</a></li>
+                            <li><a href="https://music.163.com/#/my/m/music/playlist?id=2462333358"
+                                    target="_blank">more...</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </section>
+
+        </div>
+        <div class="col-4 col-12-narrower">
+
+            <section>
+                <!--<span class="icon solid featured fa-check"></span>-->
+                <header>
+                    <h3>&emsp;&nbsp;&nbsp;文章</h3>
+                </header>
+                <div>
+                    <table border="1">
+                        <tr>
+                            <td>
+                                <ol>
+
+                                    <li><a href="虞美人.html" target="_blank">虞美人</a></li>
+                                    <li><a href="#">将进酒</a></li>
+                                    <li><a href="#">醉翁亭记</a></li>
+                                    <li><a href="#">故都的秋</a></li>
+                                    <li><a href="#">匆匆</a></li>
+                                </ol>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- Three -->
+<section class="wrapper style3 container special">
+
+    <header class="major">
+        <h2>视频</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.bilibili.com/video/BV1WE411A7zC" target="_blank"><img
+                        src="{{ url_for('static', filename='images/pic01.png') }}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.bilibili.com/bangumi/play/ep249477?from=search&seid=3139116198927971888"
+                    target="_blank"><img src="{{ url_for('static', filename='images/pic03.png') }}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+
+        <!--<div class="col-6 col-12-narrower">
+
+      <section>
+          <a href="https://v.qq.com/x/cover/xos8vis78hfx6tu/a0012992z01.html" target="_blank"><img src="images/pic02.jpeg" alt="" /></a>
+          <header>
+              <h3>标题9</h3>
+          </header>
+          <p>段落9</p>
+      </section>
+
+      </div>-->
+
+    </div>
+
+    <footer class="major">
+        <ul class="buttons">
+            <li><a href="#" class="button">See More</a></li>
+        </ul>
+    </footer>
+
+
+    <!-- Four -->
+</section>
+<section class="wrapper style3 container special">
+
+    <header class="major">
+        <h2>网址大全</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://weibo.com/" target="_blank"><img class="normal1"
+                        src="{{ url_for('static', filename='images/weibo.jpg') }}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.baidu.com/" target="_blank"><img class="normal2"
+                        src="{{ url_for('static', filename='images/baidu.png')}}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.w3school.com.cn/index.html" target="_blank"><img class="normal3"
+                        src="{{ url_for('static', filename='images/w3school.jpg')}}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.icourse163.org/" target="_blank"><img class="normal4"
+                        src="{{ url_for('static', filename='images/mooc.jpg')}}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.wikipedia.org/" target="_blank"><img class="normal5"
+                        src="{{ url_for('static', filename='images/wiki.jpg')}}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+
+        <div class="col-6 col-12-narrower">
+
+            <section>
+                <a href="https://www.bilibili.com/" target="_blank"><img class="normal6"
+                        src="{{ url_for('static', filename='images/bilibili.jpg')}}" alt="" /></a>
+                <header>
+                    <h3></h3>
+                </header>
+                <p></p>
+            </section>
+
+        </div>
+
+    </div>
+
+    <footer class="major">
+        <ul class="buttons">
+            <li><a href="#" class="button">See More</a></li>
+        </ul>
+    </footer>
+
+</section>
+
+{% endblock %}

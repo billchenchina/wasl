@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    {% block head %}
+    <title>{% block title %}{% endblock %} - WASL</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <noscript>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/noscript.css') }}" />
+    </noscript>
+    {% endblock %}
+</head>
+
+
+<body class="index is-preload">
+    <div id="page-wrapper">
+        <!-- Header -->
+
+        <header id="header" class="alt">
+            {% block header %}
+            <nav id="nav">
+                <ul>
+                    <li class="current"><a href="index.html">Welcome</a></li>
+                    <!-- <li class="submenu">
+                        <ul>
+                        </ul>
+                    </li> -->
+                    <li><a href="{{ url_for('register') }}" target="_blank" class="button primary">注册</a></li>
+                    <li><a href="{{ url_for('login') }}" target="_blank" class="button primary">登录</a></li>
+                </ul>
+            </nav>
+            {% endblock %}
+        </header>
+
+
+
+        <!-- Banner -->
+        <section id="banner">
+            {% block banner %}{% endblock %}
+        </section>
+
+
+
+        <!-- Main -->
+        <article id="main">
+            {% block main %}{% endblock %}
+        </article>
+
+        <!-- Footer -->
+        <footer id="footer">
+            {% block footer %}
+            <!-- Footer -->
+            {% endblock %}
+        </footer>
+
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.dropotron.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.scrolly.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.scrollex.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/browser.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/breakpoints.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/util.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>
