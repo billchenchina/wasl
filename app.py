@@ -230,7 +230,6 @@ def verify_assertion():
         webauthn_assertion_response.verify()
     except Exception as e:
         return make_response(jsonify({'status': 'failed', 'msg': '{}'.format(e)}), 401)
-    print(name)
     session['register_username'] = name
     session['register_display_name'] = user.display_name
     session['register_ukey'] = publickey_redential.ukey
