@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+
+{% block title %}注册{% endblock %}
+
+
+{% block main %}
+<header class="special container">
+	<!--<span class="icon solid fa-envelope"></span>-->
+	<h2>注册</h2>
+	<p>--------------------------------------------</p>
+</header>
+
+<!-- One -->
+<section class="wrapper style4 special container medium">
+
+	<!-- Content -->
+	<div class="content">
+		<div class="row gtr-50">
+			<div class="col-6 col-12-mobile">
+				<input type="email" name="email" placeholder="username@example.com" />
+			</div>
+			<div class="col-6 col-12-mobile">
+				<input type="text" name="name" placeholder="Matt John" />
+			</div>
+
+			<div class="col-12">
+				<ul class="buttons">
+					<li><input type="submit" class="special" value="注册" id="btn" /></li>
+				</ul>
+			</div>
+			<div class="col-12" id="inputerr">
+			</div>
+		</div>
+	</div>
+
+</section>
+
+{% endblock %}
+
+{% block footer %}
+
+<ul class="icons">
+	<li><a href="#" class="icon brands circle fa-twitter"><span class="label">Twitter</span></a></li>
+	<li><a href="#" class="icon brands circle fa-facebook-f"><span class="label">Facebook</span></a></li>
+	<li><a href="#" class="icon brands circle fa-google-plus-g"><span class="label">Google+</span></a></li>
+	<li><a href="#" class="icon brands circle fa-github"><span class="label">Github</span></a></li>
+	<li><a href="#" class="icon brands circle fa-dribbble"><span class="label">Dribbble</span></a></li>
+</ul>
+
+<ul class="copyright">
+	<li>&copy; Untitled</li>
+	<li> <a href="http://hit.edu.cn">HIT</a></li>
+</ul>
+
+{% endblock %}
+
+{% block body %}
+{{super()}}
+<script type="text/javascript">
+	/**
+	 * Transforms items in the credentialCreateOptions generated on the server
+	 * into byte arrays expected by the navigator.credentials.create() call
+	 * @param {Object} credentialCreateOptionsFromServer 
+	 */
+	const transformCredentialCreateOptions = (credentialCreateOptionsFromServer) => {
+		let { challenge, user } = credentialCreateOptionsFromServer;
+		user.id = Uint8Array.from(
+			atob(credentialCreateOptionsFromServer.user.id
+				.replace(/\_/g, "/")
+				.replace(/\-/g, "+")
+			),
+			c => c.charCodeAt(0));
+
+		challenge = Uint8Array.from(
+			atob(credentialCreateOptionsFromServer.challenge
+				.replace(/\_/g, "/")
+				.replace(/\-/g, "+")
+			),
+			c => c.charCodeAt(0));
+
+		const transformedCredentialCreateOptions = Object.assign(
+			{}, credentialCreateOptionsFromServer,
+			{ challenge, user });
+
+		return transformedCredentialCreateOptions;
+	}
+	let publicKey = {
+		rp: {
+			name: "WASL",
+			id: location.hostname
+		},
+		challenge: undefined,
+		user: {
+			displayName: undefined,
+			id: undefined,
+			name: undefined
+		},
+		pubKeyCredParams: undefined
+	}
+	$('#btn').click(() => {
+		$('#inputerr').hide();
+		let name = $('[name=email]')[0].value;
+		let display_name = $('[name=name]')[0].value;
+		if (!name) {
+			$('#inputerr').text("尚未填写邮箱！");
+		} else if (! /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w+)+$/.test(name)) {
+			$('#inputerr').text("邮箱格式错误！");
+		} else if (!display_name) {
+			$('#inputerr').text("未填写显示名！");
+		} else if (!window.PublicKeyCredential) {
+			$('#inputerr').text("你的浏览器或设备不支持，无法注册！");
+		} else {
+			$('#inputerr').text("");
+		}
+		if ($('#inputerr').text()) {
+			$('#inputerr').show();
+			return;
+		}
+		$.post('/webauthn_begin_activate', {
+			"name": name,
+			"display_name": display_name
+		}, (resp) => {
+			console.log(resp["status"]);
+			if (resp["status"] == "failed") {
+				$('#inputerr').text("未知错误");
+				$('#inputerr').show();
+				return;
+			}
+			console.log(resp);
+			let publicKeyCredentialCreateOptions = transformCredentialCreateOptions(resp.publicKey);
+			navigator.credentials.create({publicKey:publicKeyCredentialCreateOptions}).then(
+				function (newCredentialInfo) {
+					console.log(newCredentialInfo);
+				}
+			);
+		})
+	});
+</script>
+{% endblock %}

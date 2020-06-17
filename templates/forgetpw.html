@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}找回密码{% endblock %}
+{% block main %}
+
+<header class="special container">
+	<h2>找回密码</h2>
+	<p>--------------------------------------------</p>
+</header>
+
+<!-- One -->
+<section class="wrapper style4 special container medium">
+
+	<!-- Content -->
+	<div class="content">
+		<form>
+			<div class="row gtr-50">
+				<div class="col-6 col-12-mobile">
+					<input type="text" name="name" placeholder="Name" />
+				</div>
+				<div class="col-6 col-12-mobile">
+					<input type="text" name="email" placeholder="Email" />
+				</div>
+				<div class="col-6 col-12-mobile">
+					<input type="text" name="scuritycode" placeholder="Secuity code">
+				</div>
+				<div class="col-12">
+					<ul class="buttons">
+						<li><button type="button"><a href="{{ url_for('forgetpw') }}">验证</a></button></li>
+					</ul>
+				</div>
+			</div>
+		</form>
+	</div>
+
+</section>
+{% endblock %}

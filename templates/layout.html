@@ -15,6 +15,7 @@
 
 
 <body class="index is-preload">
+    {% block body %}
     <div id="page-wrapper">
         <!-- Header -->
 
@@ -22,7 +23,7 @@
             {% block header %}
             <nav id="nav">
                 <ul>
-                    <li class="current"><a href="index.html">Welcome</a></li>
+                    <li class="current"><a href="{{ url_for('index')}}">Welcome</a></li>
                     <!-- <li class="submenu">
                         <ul>
                         </ul>
@@ -66,6 +67,7 @@
     <script src="{{ url_for('static', filename='js/breakpoints.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/util.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% endblock %}
 
 </body>
 
