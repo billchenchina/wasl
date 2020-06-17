@@ -10,7 +10,7 @@ def validate_name(name):
         return False
     if len(name) >= 60:
         return False
-    if re.search('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$',name):
+    if re.search('^\w+([\.-]?\w+)*[@]\w+[.]\w+$',name):
         return True
     return False
 
