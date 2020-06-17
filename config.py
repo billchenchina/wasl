@@ -24,5 +24,5 @@ pubkey_credparams = [
 
 rp = {
     "name": "A test site",
-    "id": "localhost"
+    "id": "test.com"
 }

@@ -84,6 +84,12 @@
 
 		return transformedCredentialCreateOptions;
 	}
+	function b64enc(buf) {
+		return base64js.fromByteArray(buf)
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_")
+			.replace(/=/g, "");
+	}
 
 	/**
 	 * Transforms the binary data in the credential into base64 strings
@@ -141,9 +147,21 @@
 			}
 			console.log(resp);
 			let publicKeyCredentialCreateOptions = transformCredentialCreateOptions(resp.publicKey);
-			let authenticator_attestation_response = await navigator.credentials.create({ publicKey: publicKeyCredentialCreateOptions });
-			let assertion_for_server = transformNewAssertionForServer(authenticator_attestation_response);
-			console.log(assertion_for_server);
+			navigator.credentials.create({ publicKey: publicKeyCredentialCreateOptions }).then((authenticator_attestation_response) => {
+				let assertion_for_server = transformNewAssertionForServer(authenticator_attestation_response);
+				console.log(assertion_for_server);
+				try {
+					$.post('/verify_credential_info', assertion_for_server, (assertionValidationResponse) => {
+
+					});
+				} catch (err) {
+					$('#inputerr').text("未知错误");
+					$('#inputerr').show();
+				}
+			});
+
+
+
 
 		})
 	});

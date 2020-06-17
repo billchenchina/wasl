@@ -8,6 +8,10 @@ from config import *
 from util import *
 from db import db
 from models.user import User
+from models.publickeycredential import PublicKeyCredential
+
+import webauthn
+
 app = Flask(__name__, static_url_path='/assets')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(
     os.path.join(os.path.dirname(os.path.abspath(__name__)), 'webauthn.db'))
@@ -56,6 +60,12 @@ def get_pubkey_credparams():
 def webauthn_begin_activate():
     name = request.form.get('name')
     display_name = request.form.get('display_name')
+    if User.query.filter_by(email=name).first():
+        return make_response(
+            jsonify({
+                "status": "failed",
+                "msg": "User already exists."
+            }), 401)
     if not validate_name(name):
         return make_response(
             jsonify({
@@ -91,14 +101,57 @@ def webauthn_begin_activate():
             "challenge": session['challenge']
         }
     })
-@app.route('/verify_credential_info', methods = ["POST"])
+
+
+@app.route('/verify_credential_info', methods=["POST"])
 def verify_credential_info():
-    name = session('register_username')
-    display_name = session('register_display_name')
-    ukey = session('register_ukey')
-    challenge = session('challenge')
-    
+    name = session['register_username']
+    display_name = session['register_display_name']
+    ukey = session['register_ukey']
+    challenge = session['challenge']
+    registration_response = request.form
+    webauthn_registration_response = webauthn.WebAuthnRegistrationResponse(
+        rp["id"],
+        request.host_url[:-1], # This aims to remove the ending slash
+        registration_response,
+        challenge,
+        self_attestation_permitted=True,
+        none_attestation_permitted=True)
+    try:
+        webauthn_credential = webauthn_registration_response.verify()
+    except Exception as e:
+        return make_response(jsonify({"status": "failed", "msg": str(e)}), 401)
+    if PublicKeyCredential.query.filter_by(
+            credential_id=webauthn_credential.credential_id).first():
+        return make_response(
+            jsonify({
+                "status": "failed",
+                "msg": "Key already exists."
+            }), 401)
+    if User.query.filter_by(email=name).first():
+        return make_response(
+            jsonify({
+                "status": "failed",
+                "msg": "User already exists."
+            }), 401)
+
+    webauthn_credential.credential_id = str(webauthn_credential.credential_id,
+                                            "utf-8")
+    webauthn_credential.public_key = str(webauthn_credential.public_key,
+                                         "utf-8")
+    user = User(display_name=display_name, email=name)
+    db.session.add(user)
+    publickey_redential = PublicKeyCredential(
+        ukey=ukey,
+        credential_id=webauthn_credential.credential_id,
+        pub_key=webauthn_credential.public_key,
+        rp_id=rp["id"],
+        email=name,
+        user=user)
+    db.session.add(publickey_redential)
+    db.session.commit()
+    return make_response(jsonify({"status": "success"}))
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='test.com', port=8443, ssl_context='adhoc')
