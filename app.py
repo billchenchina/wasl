@@ -31,6 +31,7 @@ app.secret_key = secret_key
 Functions for serving from template
 """
 
+
 @login_manager.user_loader
 def load_user(user_id):
     try:
@@ -39,6 +40,7 @@ def load_user(user_id):
         return None
 
     return User.query.get(int(user_id))
+
 
 @app.route('/')
 def index():
@@ -58,6 +60,7 @@ def register():
 @app.route('/forgetpw/')
 def forgetpw():
     return render_template('forgetpw.html')
+
 
 @app.route('/webauthn_begin_activate', methods=['POST'])
 def webauthn_begin_activate():
@@ -115,7 +118,7 @@ def verify_credential_info():
     registration_response = request.form
     webauthn_registration_response = webauthn.WebAuthnRegistrationResponse(
         rp["id"],
-        request.host_url[:-1], # This aims to remove the ending slash
+        request.host_url[:-1],  # This aims to remove the ending slash
         registration_response,
         challenge,
         self_attestation_permitted=True,
@@ -156,11 +159,83 @@ def verify_credential_info():
     login_user(user)
     return make_response(jsonify({"status": "success"}))
 
+
+@app.route('/webauthn_begin_assertion', methods=["POST"])
+def webauthn_begin_assertion():
+    name = request.form.get('name')
+    user = User.query.filter_by(email=name).first()
+    if not user:
+        return make_response(
+            jsonify({
+                "status": "failed",
+                "msg": "user not found"
+            }), 401)
+    pubkey_credential = user.publickeys.first()
+    if not pubkey_credential:
+        return make_response(
+            jsonify({
+                "status": "failed",
+                "msg": "pubkey not found"
+            }), 401)
+    session.pop('challenge', None)
+    challenge = generate_challenge(32)
+    session['challenge'] = challenge.rstrip('=')
+    return jsonify({
+        "challenge":
+        challenge,
+        "allowCredentials": [{
+            "type": "public-key",
+            "id": pubkey_credential.credential_id,
+            "transports": ['usb', 'nfc', 'ble', 'internal']
+        }],
+        "status":
+        "success"
+    })
+
+
+@app.route('/verify_assertion', methods=["POST"])
+def verify_assertion():
+    challenge = session['challenge']
+    assertion_response = request.form
+    credential_id = assertion_response.get('id')
+    publickey_redential = PublicKeyCredential.query.filter_by(
+        credential_id=credential_id).first()
+    if not publickey_redential:
+        return make_response(
+            jsonify({
+                "status": "failed",
+                "msg": "No pubkey found"
+            }), 401)
+    user = publickey_redential.user
+    name = publickey_redential.email
+    webauthn_user = webauthn.WebAuthnUser(publickey_redential.ukey, name,
+                                          user.display_name, "", credential_id,
+                                          publickey_redential.pub_key, 0,
+                                          publickey_redential.rp_id)
+    webauthn_assertion_response = webauthn.WebAuthnAssertionResponse(
+        webauthn_user,
+        assertion_response,
+        challenge,
+        request.host_url[:-1],
+        uv_required=False)
+    try:
+        webauthn_assertion_response.verify()
+    except Exception as e:
+        return make_response(jsonify({'status': 'failed', 'msg': '{}'.format(e)}), 401)
+    print(name)
+    session['register_username'] = name
+    session['register_display_name'] = user.display_name
+    session['register_ukey'] = publickey_redential.ukey
+    login_user(user)
+    return jsonify({"status": "success"})
+
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     app.run(host='test.com', port=8443, ssl_context='adhoc')

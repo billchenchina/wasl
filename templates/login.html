@@ -15,25 +15,26 @@
 
 	<!-- Content -->
 	<div class="content">
-		<form>
-			<div class="row gtr-50">
+		<div class="row gtr-50">
+			<!-- 				
 				<div class="col-6 col-12-mobile">
 					<input type="text" name="name" placeholder="name" />
-				</div>
-				<div class="col-6 col-12-mobile">
-					<input type="text" name="email" placeholder="password" />
-				</div>
-
-
-				<div class="col-12">
-					<ul class="buttons">
-						<li><input type="submit" class="special" value="登录" /></li>
-					</ul>
-				</div>
-				<h5>忘记密码？</h5>
-				<a href="{{ url_for('forgetpw') }}" target="_blank">点这里</a>
+				</div> -->
+			<div class="col-6 col-12-mobile">
+				<input type="email" name="email" placeholder="username@example.com" />
 			</div>
-		</form>
+
+
+			<div class="col-12">
+				<ul class="buttons">
+					<li><input type="submit" class="special" value="登录" id="btn" /></li>
+				</ul>
+			</div>
+			<!--
+				<h5>忘记密码？</h5>
+				<a href="{{ url_for('forgetpw') }}" target="_blank">点这里</a>-->
+			<div class="col-12" id="inputerr"></div>
+		</div>
 	</div>
 
 </section>
@@ -52,4 +53,125 @@
 	<li>&copy; Untitled</li>
 	<li> <a href="http://hit.edu.cn">HIT</a></li>
 </ul>
+{% endblock %}
+
+{% block body %}
+{{super()}}
+<script type="text/javascript">
+	function b64RawEnc(buf) {
+		return base64js.fromByteArray(buf)
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_");
+	}
+	function b64enc(buf) {
+		return base64js.fromByteArray(buf)
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_")
+			.replace(/=/g, "");
+	}
+	function hexEncode(buf) {
+		return Array.from(buf)
+			.map(function (x) {
+				return ("0" + x.toString(16)).substr(-2);
+			})
+			.join("");
+	}
+
+	const transformCredentialRequestOptions = (credentialRequestOptionsFromServer) => {
+		let { challenge, allowCredentials } = credentialRequestOptionsFromServer;
+
+		challenge = Uint8Array.from(
+			atob(challenge.replace(/\_/g, "/").replace(/\-/g, "+")), c => c.charCodeAt(0));
+
+		allowCredentials = allowCredentials.map(credentialDescriptor => {
+			let { id } = credentialDescriptor;
+			id = id.replace(/\_/g, "/").replace(/\-/g, "+");
+			id = Uint8Array.from(atob(id), c => c.charCodeAt(0));
+			return Object.assign({}, credentialDescriptor, { id });
+		});
+
+		const transformedCredentialRequestOptions = Object.assign(
+			{},
+			credentialRequestOptionsFromServer,
+			{ challenge, allowCredentials });
+
+		return transformedCredentialRequestOptions;
+	};
+	/**
+ * Encodes the binary data in the assertion into strings for posting to the server.
+ * @param {PublicKeyCredential} newAssertion 
+ */
+	const transformAssertionForServer = (newAssertion) => {
+		const authData = new Uint8Array(newAssertion.response.authenticatorData);
+		const clientDataJSON = new Uint8Array(newAssertion.response.clientDataJSON);
+		const rawId = new Uint8Array(newAssertion.rawId);
+		const sig = new Uint8Array(newAssertion.response.signature);
+		const assertionClientExtensions = newAssertion.getClientExtensionResults();
+
+		return {
+			id: newAssertion.id,
+			rawId: b64enc(rawId),
+			type: newAssertion.type,
+			authData: b64RawEnc(authData),
+			clientData: b64RawEnc(clientDataJSON),
+			signature: hexEncode(sig),
+			assertionClientExtensions: JSON.stringify(assertionClientExtensions)
+		};
+	};
+
+
+	$('#btn').click(() => {
+		$('#inputerr').hide();
+		let name = $('[name=email]')[0].value;
+		if (!name) {
+			$('#inputerr').text("尚未填写邮箱！");
+		} else if (! /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w+)+$/.test(name)) {
+			$('#inputerr').text("邮箱格式错误！");
+		} else if (!window.PublicKeyCredential) {
+			$('#inputerr').text("你的浏览器或设备不支持，无法注册！");
+		} else {
+			$('#inputerr').text("");
+		}
+		if ($('#inputerr').text()) {
+			$('#inputerr').show();
+			return;
+		}
+		$.post('/webauthn_begin_assertion', {
+			name: name
+		}, (resp) => {
+			console.log(resp["status"]);
+			if (resp["status"] == "failed") {
+				$('#inputerr').text("未知错误");
+				$('#inputerr').show();
+				return;
+			}
+			console.log(resp);
+
+			let transformedCredentialRequestOptions = transformCredentialRequestOptions(resp);
+			navigator.credentials.get({ publicKey: transformedCredentialRequestOptions }).then((assertion) => {
+				let transformedAssertionForServer = transformAssertionForServer(assertion);
+				console.log(transformedAssertionForServer);
+				try {
+					$.post('/verify_assertion', transformedAssertionForServer, (response) => {
+						if (response["status"] == "success") {
+							$('#inputerr').text("login success");
+							$('#inputerr').show();
+							setTimeout(() => { location.href = "/" }, 2000);
+						}
+					}).fail((jqXHR, textStatus, errorThrown) => {
+						$('#inputerr').text(jqXHR.responseJSON.msg);
+						$('#inputerr').show();
+					});
+				} catch (err) {
+					$('#inputerr').text("未知错误");
+					$('#inputerr').show();
+				}
+			});
+
+		}).fail((jqXHR, textStatus, errorThrown) => {
+			$('#inputerr').text(jqXHR.responseJSON.msg);
+			$('#inputerr').show();
+		})
+	});
+</script>
 {% endblock %}
