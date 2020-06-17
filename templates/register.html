@@ -84,19 +84,32 @@
 
 		return transformedCredentialCreateOptions;
 	}
-	let publicKey = {
-		rp: {
-			name: "WASL",
-			id: location.hostname
-		},
-		challenge: undefined,
-		user: {
-			displayName: undefined,
-			id: undefined,
-			name: undefined
-		},
-		pubKeyCredParams: undefined
+
+	/**
+	 * Transforms the binary data in the credential into base64 strings
+	 * for posting to the server.
+	 * @param {PublicKeyCredential} newAssertion 
+	 */
+	const transformNewAssertionForServer = (newAssertion) => {
+		const attObj = new Uint8Array(
+			newAssertion.response.attestationObject);
+		const clientDataJSON = new Uint8Array(
+			newAssertion.response.clientDataJSON);
+		const rawId = new Uint8Array(
+			newAssertion.rawId);
+
+		const registrationClientExtensions = newAssertion.getClientExtensionResults();
+
+		return {
+			id: newAssertion.id,
+			rawId: b64enc(rawId),
+			type: newAssertion.type,
+			attObj: b64enc(attObj),
+			clientData: b64enc(clientDataJSON),
+			registrationClientExtensions: JSON.stringify(registrationClientExtensions)
+		};
 	}
+
 	$('#btn').click(() => {
 		$('#inputerr').hide();
 		let name = $('[name=email]')[0].value;
@@ -128,11 +141,10 @@
 			}
 			console.log(resp);
 			let publicKeyCredentialCreateOptions = transformCredentialCreateOptions(resp.publicKey);
-			navigator.credentials.create({publicKey:publicKeyCredentialCreateOptions}).then(
-				function (newCredentialInfo) {
-					console.log(newCredentialInfo);
-				}
-			);
+			let authenticator_attestation_response = await navigator.credentials.create({ publicKey: publicKeyCredentialCreateOptions });
+			let assertion_for_server = transformNewAssertionForServer(authenticator_attestation_response);
+			console.log(assertion_for_server);
+
 		})
 	});
 </script>

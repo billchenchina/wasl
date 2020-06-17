@@ -91,11 +91,13 @@ def webauthn_begin_activate():
             "challenge": session['challenge']
         }
     })
-
-
-@app.route('/makeCredential/<string:email>')
-def make_credential(email: str):
-    return email
+@app.route('/verify_credential_info', methods = ["POST"])
+def verify_credential_info():
+    name = session('register_username')
+    display_name = session('register_display_name')
+    ukey = session('register_ukey')
+    challenge = session('challenge')
+    
 
 
 if __name__ == '__main__':
