@@ -54,3 +54,6 @@ def generate_ukey():
     arbitrary string specified by the relying party.
     '''
     return generate_challenge(UKEY_DEFAULT_BYTE_LEN)
+
+def split_by_crlf(s):
+    return [v for v in s.splitlines() if v]
