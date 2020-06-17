@@ -59,19 +59,6 @@ def register():
 def forgetpw():
     return render_template('forgetpw.html')
 
-
-"""
-/getPubKeyCredParams
-This function is for fetching pubKeyCredParams from server
-Check MDN https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions/pubKeyCredParams
-"""
-
-
-@app.route('/getPubKeyCredParams')
-def get_pubkey_credparams():
-    return json.dumps(pubkey_credparams)
-
-
 @app.route('/webauthn_begin_activate', methods=['POST'])
 def webauthn_begin_activate():
     name = request.form.get('name')

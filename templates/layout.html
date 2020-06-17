@@ -28,8 +28,13 @@
                         <ul>
                         </ul>
                     </li> -->
+                    {% if current_user.is_authenticated %}
+                    <li>Hi, {{ current_user.display_name }}</li>
+                    <li><a href="{{ url_for('logout') }}" target="_blank" class="button primary">登出</a></li>
+                    {% else %}
                     <li><a href="{{ url_for('register') }}" target="_blank" class="button primary">注册</a></li>
                     <li><a href="{{ url_for('login') }}" target="_blank" class="button primary">登录</a></li>
+                    {% endif %}
                 </ul>
             </nav>
             {% endblock %}
