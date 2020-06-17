@@ -1,7 +1,7 @@
 import json
 import os
 import datetime
-from flask import Flask, session, render_template, g, url_for, request, jsonify, make_response
+from flask import Flask, session, render_template, g, url_for, request, jsonify, make_response, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 from config import *
@@ -12,17 +12,33 @@ from models.publickeycredential import PublicKeyCredential
 
 import webauthn
 
+from flask_login import LoginManager
+from flask_login import login_required
+from flask_login import login_user
+from flask_login import logout_user
+
 app = Flask(__name__, static_url_path='/assets')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(
     os.path.join(os.path.dirname(os.path.abspath(__name__)), 'webauthn.db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+
 app.secret_key = secret_key
 """
 Functions for serving from template
 """
 
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        int(user_id)
+    except ValueError:
+        return None
+
+    return User.query.get(int(user_id))
 
 @app.route('/')
 def index():
@@ -150,8 +166,14 @@ def verify_credential_info():
         user=user)
     db.session.add(publickey_redential)
     db.session.commit()
+    login_user(user)
     return make_response(jsonify({"status": "success"}))
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='test.com', port=8443, ssl_context='adhoc')

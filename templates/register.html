@@ -152,7 +152,14 @@
 				console.log(assertion_for_server);
 				try {
 					$.post('/verify_credential_info', assertion_for_server, (assertionValidationResponse) => {
-
+						if (assertionValidationResponse["status"] == "success") {
+							$('#inputerr').text("注册成功");
+							$('#inputerr').show();
+							setTimeout(() => { location.href = "/" }, 2000);
+						}
+					}).fail((jqXHR, textStatus, errorThrown) => {
+						$('#inputerr').text(jqXHR.responseJSON.msg);
+						$('#inputerr').show();
 					});
 				} catch (err) {
 					$('#inputerr').text("未知错误");
@@ -160,9 +167,9 @@
 				}
 			});
 
-
-
-
+		}).fail((jqXHR, textStatus, errorThrown) => {
+			$('#inputerr').text(jqXHR.responseJSON.msg);
+			$('#inputerr').show();
 		})
 	});
 </script>
