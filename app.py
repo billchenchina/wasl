@@ -12,6 +12,8 @@ from models.publickeycredential import PublicKeyCredential
 
 import webauthn
 
+from html import escape
+
 import oauth2
 from oauth2 import authorization, require_oauth
 from authlib.oauth2 import OAuth2Error
@@ -69,6 +71,10 @@ def register():
 def forgetpw():
     return render_template('forgetpw.html')
 
+@app.route('/profile')
+def profile():
+    if current_user:
+        return "<html><body><p>Email: %s</p><p>Name: %s</p></body></body>" % (current_user.email, escape(current_user.display_name))
 
 @app.route('/webauthn_begin_activate', methods=['POST'])
 def webauthn_begin_activate():
