@@ -29,7 +29,7 @@
                         </ul>
                     </li> -->
                     {% if current_user.is_authenticated %}
-                    <li>Hi, {{ current_user.display_name }}</li>
+                    <li>Hi, {{ current_user.display_name|safe }}</li>
                     <li><a href="{{ url_for('logout') }}" target="_blank" class="button primary">登出</a></li>
                     {% else %}
                     <li><a href="{{ url_for('register') }}" target="_blank" class="button primary">注册</a></li>
