@@ -3,7 +3,7 @@ astroid==2.3.3
 Authlib==0.14.3
 autopep8==1.4.4
 cbor2==4.0.1
-certifi==2020.4.5.2
+certifi==2022.12.7
 cffi==1.13.2
 chardet==3.0.4
 Click==7.0
